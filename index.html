@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Lompat Jawaban IPA - Sistem Pernapasan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b1630;
+  --card: #14264d;
+  --ink: #fff;
+  --mut: #a9bbe0;
+  --acc: #ffc233;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(#3fa2f2, #c4e7ff 70%, #e6f5ff);
+  color: var(--ink);
+  font-family: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+button, input, select, textarea { font-family: inherit; }
+
+#app {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+#app canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+#sun {
+  position: absolute;
+  top: 40px;
+  right: 4%;
+  width: clamp(60px, 12vw, 110px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* BANNER JUDUL */
+#ttl {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  display: none;
+  pointer-events: none;
+  font: 800 clamp(26px, 4.5vw, 48px)/0.95 "Fredoka", sans-serif;
+  letter-spacing: 1px;
+  z-index: 6;
+}
+#ttl span {
+  display: block;
+  transform: rotate(-3deg);
+  color: #fcd34d;
+  -webkit-text-stroke: 6px #b45309;
+  paint-order: stroke fill;
+  text-shadow: 0 6px 0 #b45309;
+}
+#ttl span + span {
+  transform: rotate(2deg);
+  color: #ffffff;
+  -webkit-text-stroke: 6px #1d4ed8;
+  text-shadow: 0 6px 0 #1e3a8a;
+}
+
+/* KOTAK PENGISIAN NAMA & KELAS DI BAWAH PREVIEW KARAKTER 3D */
+#player-info-card {
+  position: fixed;
+  left: calc((100vw - min(50vw, 680px)) / 2);
+  transform: translateX(-50%);
+  bottom: 20px;
+  width: min(340px, calc(100vw - min(50vw, 680px) - 32px));
+  background: #ffffff;
+  border: 4px solid #bfdbfe;
+  border-radius: 20px;
+  padding: 14px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  display: none;
+  box-sizing: border-box;
+}
+#player-info-card .card-ttl {
+  font-size: 14px;
+  font-weight: 800;
+  color: #1e3a8a;
+  text-align: center;
+  margin-bottom: 10px;
+  background: #e0f2fe;
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+.info-row { display: flex; flex-direction: column; gap: 8px; }
+.info-field { display: flex; flex-direction: column; gap: 4px; }
+.info-field label { font-size: 12px; font-weight: 700; color: #334155; }
+.info-field input, .info-field select {
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  background: #f8fafc;
+  color: #1e293b;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.info-field input:focus, .info-field select:focus {
+  border-color: #3b82f6;
+  background: #ffffff;
+}
+
+/* PANEL OPSI KANAN */
+#cr {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(50vw, 680px);
+  overflow-y: auto;
+  padding: 20px 20px 100px 20px;
+  box-sizing: border-box;
+  background: rgba(224, 242, 254, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-left: 4px solid #ffffff;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.12);
+  z-index: 5;
+  display: none;
+}
+
+.sec {
+  border-radius: 20px;
+  padding: 14px;
+  margin-bottom: 14px;
+  background: #ffffff;
+  border: 3px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+.sh {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  background: #1e3a8a !important;
+  border-radius: 999px;
+  padding: 4px 16px 4px 4px;
+}
+.sh i {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: #fff;
+  font: 700 15px/28px "Fredoka", sans-serif;
+  text-align: center;
+  font-style: normal;
+  background: #3b82f6;
+  border: none;
+}
+.sh b {
+  background: transparent;
+  color: #ffffff !important;
+  font-size: 15px;
+  font-weight: 700;
+}
+.ths { display: flex; flex-wrap: wrap; gap: 8px; }
+.th {
+  width: 80px;
+  border: 3px solid transparent;
+  border-radius: 16px;
+  background: #f8fafc;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+.th:hover { transform: translateY(-2px); background: #ffffff; }
+.th img { width: 100%; aspect-ratio: 1; display: block; border-radius: 10px; background: transparent; }
+.th span {
+  display: inline-block;
+  width: 100%;
+  border-radius: 999px;
+  padding: 3px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+  box-sizing: border-box;
+  background: #1e3a8a;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.th.on {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+.th.on span { background: #2563eb; color: #ffffff !important; }
+
+.cc {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 600;
+  background: #f1f5f9;
+  padding: 10px;
+  border-radius: 12px;
+}
+.cc input { width: 44px; height: 30px; border: 0; padding: 0; background: none; cursor: pointer; }
+
+.bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-radius: 20px;
+  margin-top: 10px;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+  border: 3px solid #e2e8f0;
+}
+#cr .go {
+  margin: 0;
+  width: 100%;
+  padding: 12px 22px;
+  font-size: 18px;
+  border-radius: 14px;
+  background: #f59e0b;
+  color: #ffffff;
+  box-shadow: 0 4px 0 #d97706;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* GAME HUD */
+#hud { display: none; }
+.chip {
+  position: absolute;
+  background: rgba(14, 36, 68, 0.92);
+  border-radius: 16px;
+  padding: 8px 14px;
+  font-weight: 700;
+  font-size: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+#top {
+  top: 0; left: 0; right: 0;
+  border-radius: 0 0 20px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 20px; font-size: 16px; background: rgba(14, 36, 68, 0.95);
+  z-index: 10;
+}
+#hp { font-size: 18px; letter-spacing: 2px; }
+
+/* SOAL COMPACT */
+#qbox {
+  top: 56px; left: 50%; transform: translateX(-50%);
+  width: min(92%, 520px);
+  padding: 12px 16px; border-radius: 18px;
+  background: rgba(14, 36, 68, 0.95);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  z-index: 10;
+}
+#q { font-size: clamp(14px, 3.2vw, 17px); line-height: 1.35; text-align: center; }
+#opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.o {
+  border-radius: 12px; padding: 6px 10px;
+  font-size: clamp(12px, 2.8vw, 15px); line-height: 1.2;
+  color: #fff; font-weight: 700; display: flex; gap: 8px; align-items: center;
+  min-height: 36px; border: 2px solid rgba(255,255,255,0.4);
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2);
+}
+.o b { background: rgba(0,0,0,0.3); border-radius: 6px; padding: 2px 8px; }
+
+#holdw {
+  position: absolute; left: 50%; bottom: 36%; transform: translateX(-50%);
+  width: 140px; height: 10px; background: rgba(0,0,0,0.5);
+  border-radius: 6px; overflow: hidden; display: none; z-index: 12;
+}
+#hold { height: 100%; width: 0; background: #ffc233; }
+
+#toast {
+  position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%);
+  font-size: clamp(18px, 4.5vw, 28px); font-weight: 800;
+  background: rgba(11, 22, 48, 0.95); padding: 12px 24px; border-radius: 16px;
+  text-align: center; display: none; max-width: 85%; z-index: 20;
+  border: 3px solid #ffc233;
+}
+#ex {
+  bottom: 150px; left: 50%; transform: translateX(-50%);
+  width: min(90%, 500px); font-size: 14px; line-height: 1.4;
+  display: none; border: 2px solid #22c55e; z-index: 10;
+}
+
+#joy {
+  position: absolute; left: 20px; bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  width: 110px; height: 110px; border-radius: 50%;
+  background: rgba(255,255,255,0.25); border: 3px solid rgba(255,255,255,0.7);
+  touch-action: none; z-index: 10;
+}
+#knob {
+  position: absolute; left: 50%; top: 50%;
+  width: 46px; height: 46px; border-radius: 50%;
+  background: rgba(255,255,255,0.95); transform: translate(-50%, -50%);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+#jump {
+  position: absolute; right: 20px; bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  width: 96px; height: 96px; border-radius: 50%; border: 3px solid #fff;
+  background: #2f7bff; color: #fff; font: 700 15px "Fredoka", sans-serif;
+  touch-action: none; box-shadow: 0 6px 0 #1b4fb3;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 10;
+}
+#jump:active { transform: translateY(3px); box-shadow: 0 2px 0 #1b4fb3; }
+#jump svg { width: 40px; height: 40px; }
+
+/* HOME SCREEN & MODALS */
+#home {
+  position: absolute; inset: 0; background: linear-gradient(135deg, #0ea5e9, #38bdf8, #bae6fd);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 50; overflow: hidden;
+}
+#home-title {
+  font: 800 clamp(36px, 8vw, 72px)/1 "Fredoka", sans-serif;
+  text-align: center; color: #fcd34d; margin-bottom: 30px;
+  -webkit-text-stroke: 6px #b45309; text-shadow: 0 8px 0 #b45309, 0 16px 30px rgba(0,0,0,0.3);
+  transform: rotate(-2deg); animation: float 3s ease-in-out infinite;
+}
+@keyframes float { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-10px) rotate(1deg); } }
+.menu-btn {
+  background: #ffffff; border: 4px solid #bfdbfe; color: #1e3a8a;
+  font: 800 18px "Fredoka", sans-serif; padding: 14px 28px; border-radius: 999px;
+  margin-bottom: 12px; width: min(85%, 340px); cursor: pointer;
+  box-shadow: 0 6px 0 #bfdbfe, 0 10px 18px rgba(0,0,0,0.12);
+  transition: all 0.15s ease;
+}
+.menu-btn:active { transform: translateY(5px); box-shadow: 0 1px 0 #bfdbfe, 0 4px 8px rgba(0,0,0,0.1); }
+.menu-btn.primary { background: #f59e0b; border-color: #fcd34d; color: #fff; box-shadow: 0 6px 0 #d97706, 0 10px 18px rgba(0,0,0,0.12); }
+.menu-btn.primary:active { box-shadow: 0 1px 0 #d97706; }
+
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center; z-index: 60; padding: 16px;
+}
+.modal-box {
+  background: #ffffff; border-radius: 24px; padding: 24px; width: min(100%, 540px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; border: 4px solid #bae6fd;
+}
+.modal-box h2 { color: #0284c7; margin-top: 0; text-align: center; }
+.audio-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; background: #f8fafc; padding: 10px; border-radius: 12px; border: 2px solid #e2e8f0; }
+.audio-row label { font-size: 14px; font-weight: 700; color: #334155; }
+.audio-row input[type="file"] { font-size: 13px; }
+
+/* OVERLAYS */
+.ov {
+  position: absolute; inset: 0; background: rgba(6, 12, 28, 0.88);
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+  overflow: auto; z-index: 30;
+}
+.card {
+  background: var(--card); border-radius: 20px; padding: 24px;
+  width: min(100%, 540px); max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+h1 { margin: 0 0 6px; font-size: 26px; color: #ffc233; }
+h2 { margin: 0 0 12px; font-size: 22px; color: #38bdf8; }
+p { color: var(--mut); margin: 4px 0 12px; line-height: 1.45; font-size: 14px; }
+textarea {
+  width: 100%; height: 160px; box-sizing: border-box; border-radius: 12px;
+  border: 2px solid #2b4175; padding: 10px; font: 12px/1.4 monospace;
+  background: #0b1630; color: #dbe6ff; user-select: text; -webkit-user-select: text;
+}
+button.go {
+  background: var(--acc); color: #1a1200; border: 0; border-radius: 14px;
+  padding: 12px 22px; font: 700 16px "Fredoka", sans-serif; margin: 10px 8px 0 0;
+  cursor: pointer; transition: transform 0.1s;
+}
+button.go:active { transform: scale(0.97); }
+button.go.sec { background: #2b4175; color: #fff; }
+summary { cursor: pointer; color: var(--acc); font-weight: 700; margin-bottom: 8px; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+td, th { padding: 8px 6px; text-align: left; border-bottom: 1px solid #2b4175; font-size: 13px; }
+
+/* MOBILE RESPONSIVE */
+@media (max-aspect-ratio: 1/1) {
+  #cr {
+    top: 50%; left: 0; right: 0; width: 100%; padding: 16px 16px 80px 16px;
+    background: rgba(255, 255, 255, 0.95); border-radius: 24px 24px 0 0;
+    border-left: none; border-top: 4px solid #ffffff;
+  }
+  #player-info-card {
+    position: relative; left: auto; bottom: auto; transform: none;
+    width: 100%; max-width: 100%; margin: 0 0 14px 0; box-sizing: border-box;
+  }
+  #ttl {
+    top: 12px; left: 50%; transform: translateX(-50%);
+    font-size: clamp(22px, 5vw, 32px); text-align: center; width: 100%;
+  }
+  #ttl span { display: inline-block; transform: rotate(-2deg); margin-right: 8px; }
+  #ttl span + span { transform: rotate(2deg); margin-right: 0; }
+  #qbox { top: 54px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HALAMAN AWAL (HOME SCREEN) -->
+<div id="home">
+  <div id="home-title">LOMPAT<br><span style="color:#ffffff;-webkit-text-stroke:6px #1d4ed8;text-shadow:0 8px 0 #1e3a8a">JAWABAN IPA</span></div>
+  <button class="menu-btn primary" id="btn-mulai">🎮 MULAI MAIN</button>
+  <button class="menu-btn" id="btn-buat-soal">📝 BUAT SOAL (Editor Visual)</button>
+  <button class="menu-btn" id="btn-muat-soal">📁 MUAT SOAL (JSON)</button>
+  <button class="menu-btn" id="btn-pengaturan-suara">🎵 PENGATURAN SUARA</button>
+  <input type="file" id="file-json" accept=".json" style="display:none">
+</div>
+
+<!-- MODAL PENGATURAN SUARA -->
+<div class="modal-overlay" id="modal-suara">
+  <div class="modal-box">
+    <h2>🎵 Pengaturan Suara Kustom</h2>
+    <p style="text-align:center;font-size:13px;margin-top:-8px">Unggah file sound Anda (.mp3/.wav). Tersimpan permanen di perangkat.</p>
+    <div class="audio-row"><label>🎶 Musik Latar (Backsound.mp3)</label><input type="file" id="au-bgm" accept="audio/*"><span id="st-bgm" style="font-size:11px;font-weight:700;color:#16a34a"></span></div>
+    <div class="audio-row"><label>👟 Suara Berjalan (Step.mp3)</label><input type="file" id="au-step" accept="audio/*"><span id="st-step" style="font-size:11px;font-weight:700;color:#16a34a"></span></div>
+    <div class="audio-row"><label>⬆️ Suara Melompat (Jump.mp3)</label><input type="file" id="au-jump" accept="audio/*"><span id="st-jump" style="font-size:11px;font-weight:700;color:#16a34a"></span></div>
+    <div class="audio-row"><label>✅ Jawaban Benar (Correct.mp3)</label><input type="file" id="au-correct" accept="audio/*"><span id="st-correct" style="font-size:11px;font-weight:700;color:#16a34a"></span></div>
+    <div class="audio-row"><label>❌ Jawaban Salah (Wrong.mp3)</label><input type="file" id="au-wrong" accept="audio/*"><span id="st-wrong" style="font-size:11px;font-weight:700;color:#16a34a"></span></div>
+    <button class="go" style="width:100%;margin-top:10px" id="btn-close-suara">Tutup & Simpan</button>
+  </div>
+</div>
+
+<!-- MODAL BUAT SOAL (EDITOR VISUAL) -->
+<div class="modal-overlay" id="modal-soal">
+  <div class="modal-box" style="width:min(100%, 640px);">
+    <h2>📝 Editor Soal Visual</h2>
+    <p style="font-size:13px; text-align:center; margin-bottom:14px;">Kelola daftar pertanyaan kuis sistem pernapasan.</p>
+    
+    <div id="soal-editor-list" style="max-height: 55vh; overflow-y: auto; padding-right: 4px; display: flex; flex-direction: column; gap: 14px;"></div>
+
+    <div style="display: flex; gap: 10px; margin-top: 16px;">
+      <button class="menu-btn" id="btn-tambah-soal" style="flex: 1; padding: 10px; font-size: 15px; margin-bottom: 0; background: #e0f2fe; border-color: #38bdf8; color: #0369a1;">➕ Tambah</button>
+      <button class="menu-btn" id="btn-unduh-soal" style="flex: 1; padding: 10px; font-size: 15px; margin-bottom: 0; background: #fef3c7; border-color: #f59e0b; color: #b45309;">📥 Unduh</button>
+      <button class="menu-btn primary" id="btn-close-soal" style="flex: 1; padding: 10px; font-size: 15px; margin-bottom: 0;">💾 Simpan</button>
+    </div>
+    <textarea id="ed" style="display:none;" spellcheck="false"></textarea>
+  </div>
+</div>
+
+<svg id="sun" viewBox="0 0 100 100" fill="#ffd84a">
+  <rect x="26" y="26" width="48" height="48"/>
+  <rect x="42" y="4" width="16" height="16"/>
+  <rect x="42" y="80" width="16" height="16"/>
+  <rect x="4" y="42" width="16" height="16"/>
+  <rect x="80" y="42" width="16" height="16"/>
+  <rect x="14" y="14" width="14" height="14" transform="rotate(45 21 21)"/>
+  <rect x="72" y="14" width="14" height="14" transform="rotate(45 79 21)"/>
+  <rect x="14" y="72" width="14" height="14" transform="rotate(45 21 79)"/>
+  <rect x="72" y="72" width="14" height="14" transform="rotate(45 79 79)"/>
+</svg>
+
+<div id="app"></div>
+<div id="ttl"><span>CUSTOM</span><span>KARAKTER</span></div>
+
+<div id="player-info-card">
+  <div class="card-ttl">👤 Identitas Pemain</div>
+  <div class="info-row">
+    <div class="info-field">
+      <label for="nm">Nama Panggilan</label>
+      <input id="nm" maxlength="14" placeholder="Ketik nama kamu...">
+    </div>
+    <div class="info-field">
+      <label for="kls">Pilih Kelas</label>
+      <select id="kls">
+        <option value="7A">Kelas 7A</option>
+        <option value="7B">Kelas 7B</option>
+        <option value="7C">Kelas 7C</option>
+        <option value="7D">Kelas 7D</option>
+        <option value="8A">Kelas 8A</option>
+        <option value="8B">Kelas 8B</option>
+        <option value="8C">Kelas 8C</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div id="cr">
+  <div id="secs"></div>
+  <div class="bar"><button class="go" id="next">Lanjut ke Game ➔</button></div>
+</div>
+
+<div id="hud">
+  <div class="chip" id="top"><span id="prog"></span><span id="hp"></span><span id="sc"></span></div>
+  <div class="chip" id="qbox"><div id="q"></div><div id="opts"></div></div>
+  <div id="holdw"><div id="hold"></div></div>
+  <div id="toast"></div>
+  <div class="chip" id="ex"></div>
+  <div id="joy"><div id="knob"></div></div>
+  <button id="jump">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="15" cy="4.5" r="2" fill="#fff"/>
+      <path d="M9 20l3-5-3-3 2-4 4 2 3 3M11 8L7 9M14 11l4-1"/>
+    </svg>LOMPAT
+  </button>
+</div>
+
+<div class="ov" id="start" style="display:none">
+  <div class="card">
+    <h1>Lompat Jawaban IPA</h1>
+    <p>Baca soal, lari dan lompat ke petak jawaban, lalu berdiri di atasnya 1 detik untuk mengunci. Jawaban benar memantulkanmu dengan pegas trampolin! Jawaban salah membuat petak retak dan runtuh.</p>
+    <button class="go" id="go">Mulai Main</button>
+    <button class="go sec" id="back">Ubah Karakter</button>
+  </div>
+</div>
+
+<div class="ov" id="end" style="display:none">
+  <div class="card" id="endc"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const APPS_SCRIPT_URL = "MASUKKAN_URL_WEB_APP_ANDA_DISINI";
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const COL = [0xef4444, 0x3b82f6, 0x22c55e, 0xf5b400], HEX = ['#ef4444', '#3b82f6', '#16a34a', '#e9a100'], L = 'ABCD', H = 18;
+
+const OPT = {
+  kulit: { n: 'Warna Kulit', v: [['Cerah', '#f9d7b5'], ['Kuning langsat', '#f1c27d'], ['Sawo muda', '#d9a066'], ['Sawo matang', '#b9794a'], ['Gelap', '#7a4a2b']] },
+  rambut: { n: 'Model Rambut', v: ['Comma Hair', 'Two Block', 'Fringe', 'Afro', 'Buzz Cut', 'French Crop', 'Bald'] },
+  warna: { n: 'Warna Rambut', v: [['Hitam', '#1b1b1f'], ['Cokelat Tua', '#4a2a12'], ['Cokelat Muda', '#a8651c'], ['Pirang', '#f2c230'], ['Abu-abu', '#8f9096'], ['Merah', '#c81e2b'], ['Biru', '#1f6fe0'], ['Putih', '#f1f1f4'], ['Ungu', '#7a2fc4']] },
+  topi: { n: 'Topi', v: ['Tanpa Topi', 'Topi Hitam', 'Topi Putih', 'Topi Retro', 'Snapback (Belakang)'] },
+  kaca: { n: 'Kacamata', v: ['Tanpa Kacamata', 'Goggles Lab', '$ Dollar', 'Thug Life', 'Kacamata Kotak'] },
+  sepatu: { n: 'Sepatu', v: [['Default', '#17171a', '#27272a', '#17171a'], ['Sneaker Hitam-Putih', '#17171a', '#f5f5f5', '#f5f5f5'], ['Sneaker Kanvas', '#17171a', '#f5f5f5', '#e5e7eb'], ['Sneaker Putih', '#f5f5f5', '#e5e7eb', '#17171a'], ['High Top', '#dc2626', '#f5f5f5', '#ffffff'], ['Custom Warna', '#facc15', '#2563eb', '#2563eb']] }
+};
+
+const DEF = `Organ pernapasan yang menjadi tempat pertama masuknya udara dari lingkungan luar adalah ....|Trakea|Hidung|Bronkus|Paru-paru|B|Hidung merupakan pintu masuk udara ke dalam sistem pernapasan.|Sistem Pernapasan
+Di dalam rongga hidung terdapat rambut-rambut halus dan lendir. Struktur tersebut berfungsi untuk ....|Menghasilkan oksigen bagi tubuh|Memompa udara menuju paru-paru|Menyaring debu dan kotoran dari udara|Mengedarkan oksigen ke seluruh tubuh|C|Rambut hidung dan lendir membantu menangkap debu serta partikel asing.|Sistem Pernapasan
+Saluran yang menghubungkan faring dengan trakea melalui pangkal tenggorokan adalah ....|Bronkus|Bronkiolus|Alveolus|Laring|D|Laring terletak di antara faring dan trakea.|Sistem Pernapasan
+Urutan jalannya udara yang benar setelah melewati rongga hidung adalah ....|Faring – laring – trakea – bronkus|Laring – faring – bronkus – trakea|Trakea – faring – laring – bronkus|Faring – trakea – laring – bronkus|A|Setelah rongga hidung, udara mengalir menuju faring, laring, trakea, bronkus, bronkiolus, hingga alveolus.|Sistem Pernapasan
+Trakea memiliki cincin tulang rawan yang berfungsi untuk ....|Menjadi tempat pertukaran gas|Menjaga saluran pernapasan tetap terbuka|Menghasilkan oksigen untuk darah|Menggerakkan paru-paru saat bernapas|B|Cincin tulang rawan mempertahankan bentuk trakea.|Sistem Pernapasan
+Percabangan trakea yang menuju paru-paru kanan dan kiri disebut ....|Alveolus|Bronkiolus|Bronkus|Faring|C|Trakea bercabang menjadi dua bronkus utama.|Sistem Pernapasan
+Bronkiolus merupakan percabangan kecil dari bronkus yang berfungsi untuk ....|Menyalurkan udara menuju alveolus|Menyaring udara menggunakan rambut hidung|Menghubungkan rongga hidung dengan faring|Menghasilkan suara ketika berbicara|A|Bronkiolus menyalurkan udara menuju alveolus.|Sistem Pernapasan
+Bagian paru-paru yang berbentuk kantong-kantong kecil dan dikelilingi pembuluh kapiler darah adalah ....|Trakea|Bronkus|Laring|Alveolus|D|Alveolus merupakan kantong udara kecil tempat pertukaran gas.|Sistem Pernapasan
+Alveolus memiliki dinding yang tipis. Struktur tersebut sesuai dengan fungsinya sebagai tempat ....|Penyaringan debu dari udara|Pertukaran oksigen dan karbon dioksida|Pengaturan suhu udara|Pembentukan suara|B|Dinding alveolus tipis untuk difusi gas.|Sistem Pernapasan
+Paru-paru manusia terdiri atas ....|Satu bagian paru-paru yang berukuran sama|Tiga bagian di sebelah kanan dan satu di sebelah kiri|Tiga lobus di sebelah kanan dan dua lobus di sebelah kiri|Dua lobus di sebelah kanan dan tiga lobus di sebelah kiri|C|Paru-paru kanan 3 lobus, paru-paru kiri 2 lobus.|Sistem Pernapasan
+Selaput yang membungkus paru-paru dan membantu mengurangi gesekan saat paru-paru bergerak disebut ....|Pleura|Diafragma|Bronkiolus|Epiglotis|A|Pleura adalah selaput pelindung paru-paru.|Sistem Pernapasan
+Otot berbentuk lembaran yang memisahkan rongga dada dan rongga perut serta berperan penting dalam pernapasan adalah ....|Pleura|Bronkus|Laring|Diafragma|D|Diafragma adalah otot utama pernapasan.|Sistem Pernapasan
+Pada sistem pernapasan manusia, epiglotis berfungsi untuk ....|Menyaring debu yang masuk melalui hidung|Membantu mencegah makanan masuk ke saluran pernapasan saat menelan|Menjadi tempat pertukaran gas di paru-paru|Mengalirkan oksigen dari darah ke seluruh tubuh|B|Epiglotis menutup jalan ke laring saat menelan.|Sistem Pernapasan
+Seorang siswa mengamati jaringan paru-paru dan menemukan banyak kantong udara kecil yang dikelilingi pembuluh darah. Jaringan tersebut berfungsi untuk ....|Menghasilkan lendir pelindung|Mengatur keluar masuknya makanan|Mempercepat pertukaran gas antara udara dan darah|Menghasilkan getaran suara|C|Permukaan luas alveolus mempercepat difusi gas.|Sistem Pernapasan
+Perhatikan urutan: Hidung → Faring → Laring → Trakea → Bronkus → Bronkiolus → Alveolus. Tempat pertukaran gas oksigen dan karbon dioksida adalah ....|Trakea|Bronkus|Bronkiolus|Alveolus|D|Alveolus adalah tempat pertukaran gas.|Sistem Pernapasan`;
+
+$('ed').value = DEF;
+const cfg = { kulit: 1, rambut: 0, warna: 3, topi: 0, kaca: 0, sepatu: 0, nama: '', kelas: '7A', sc: '#facc15', sa: '#2563eb' };
+const customAudios = { bgm: null, step: null, jump: null, correct: null, wrong: null };
+const audioData = { bgm: '', step: '', jump: '', correct: '', wrong: '' };
+
+try {
+  const s = JSON.parse(localStorage.getItem('ljipa') || '{}');
+  if (s.cfg2) {
+    for (const k in cfg) {
+      const v = s.cfg2[k];
+      if (k == 'nama') cfg[k] = String(v || '').slice(0, 14);
+      else if (k == 'kelas') cfg[k] = String(v || '7A');
+      else if (k == 'sc' || k == 'sa') { if (/^#[0-9a-f]{6}$/i.test(v)) cfg[k] = v; }
+      else if (Number.isInteger(v) && v >= 0 && v < (OPT[k] ? OPT[k].v.length : 10)) cfg[k] = v;
+    }
+  }
+  if (s.ed) $('ed').value = s.ed;
+  if (s.audio) {
+    for (const k in s.audio) {
+      audioData[k] = s.audio[k];
+      if (audioData[k]) {
+        if (k === 'bgm') {
+          customAudios.bgm = new Audio(audioData[k]);
+          customAudios.bgm.loop = true;
+          customAudios.bgm.volume = 0.4;
+        } else {
+          customAudios[k] = new Audio(audioData[k]);
+        }
+        const st = $('st-' + k);
+        if (st) st.textContent = ' ✔️ Tersimpan';
+      }
+    }
+  }
+} catch (e) {}
+
+function save() {
+  try {
+    localStorage.setItem('ljipa', JSON.stringify({ cfg2: cfg, ed: $('ed').value, audio: audioData }));
+  } catch (e) {}
+}
+
+/* AUDIO MANAGER */
+let audioCtx = null, stepTimer = 0;
+
+function initAudio() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  if (customAudios.bgm && customAudios.bgm.paused) {
+    customAudios.bgm.play().catch(()=>{});
+  }
+}
+
+function playStepSound() {
+  if (customAudios.step) {
+    customAudios.step.currentTime = 0;
+    customAudios.step.play().catch(()=>{});
+  }
+}
+
+function playJumpSound() {
+  if (customAudios.jump) {
+    customAudios.jump.currentTime = 0;
+    customAudios.jump.play().catch(()=>{});
+  }
+}
+
+function playCorrectSound() {
+  if (customAudios.correct) {
+    customAudios.correct.currentTime = 0;
+    customAudios.correct.play().catch(()=>{});
+  }
+}
+
+function playWrongSound() {
+  if (customAudios.wrong) {
+    customAudios.wrong.currentTime = 0;
+    customAudios.wrong.play().catch(()=>{});
+  }
+}
+
+function setupAudioUploads() {
+  const map = { 'au-bgm': 'bgm', 'au-step': 'step', 'au-jump': 'jump', 'au-correct': 'correct', 'au-wrong': 'wrong' };
+  for (const id in map) {
+    const el = $(id);
+    if (el) {
+      el.onchange = e => {
+        const f = e.target.files[0];
+        if (f) {
+          const reader = new FileReader();
+          reader.onload = ev => {
+            const base64 = ev.target.result;
+            const key = map[id];
+            audioData[key] = base64;
+            if (key === 'bgm') {
+              if (customAudios.bgm) customAudios.bgm.pause();
+              customAudios.bgm = new Audio(base64);
+              customAudios.bgm.loop = true;
+              customAudios.bgm.volume = 0.4;
+              customAudios.bgm.play().catch(()=>{});
+            } else {
+              customAudios[key] = new Audio(base64);
+            }
+            const st = $('st-' + key);
+            if (st) st.textContent = ' ✔️ ' + f.name + ' (Tersimpan)';
+            save();
+          };
+          reader.readAsDataURL(f);
+        }
+      };
+    }
+  }
+}
+
+/* VISUAL SOAL EDITOR LOGIC */
+function parseTextToQuestions(text) {
+  return text.split('\n').map(l => l.split('|').map(s => s.trim())).filter(a => a.length >= 7 && /^[A-Da-d]$/.test(a[5]))
+    .map(a => ({ q: a[0], o: a.slice(1, 5), ans: a[5].toUpperCase(), ex: a[6], tp: a[7] || 'Sistem Pernapasan' }));
+}
+
+function questionsToText(arr) {
+  return arr.map(item => `${item.q} | ${item.o[0]} | ${item.o[1]} | ${item.o[2]} | ${item.o[3]} | ${item.ans} | ${item.ex || '-'} | ${item.tp || 'Sistem Pernapasan'}`).join('\n');
+}
+
+function renderVisualEditor() {
+  const container = $('soal-editor-list');
+  const questions = parseTextToQuestions($('ed').value);
+  if (!questions.length) {
+    container.innerHTML = '<p style="text-align:center;color:#64748b">Belum ada soal. Silakan klik Tambah Soal.</p>';
+    return;
+  }
+  
+  container.innerHTML = questions.map((item, idx) => `
+    <div class="soal-card" data-index="${idx}" style="background:#f8fafc; border:2px solid #e2e8f0; border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:8px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-weight:800; font-size:14px; color:#0284c7;">Soal No. ${idx + 1}</span>
+        <button class="btn-del-soal" data-index="${idx}" style="background:#fee2e2; color:#dc2626; border:none; border-radius:8px; padding:4px 8px; font-weight:700; font-size:12px; cursor:pointer;">🗑️ Hapus</button>
+      </div>
+      <div>
+        <label style="font-size:12px; font-weight:700; color:#334155;">Pertanyaan:</label>
+        <input type="text" class="inp-q" value="${esc(item.q)}" style="width:100%; box-sizing:border-box; padding:6px 10px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px; font-weight:600;">
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+        <div>
+          <label style="font-size:11px; font-weight:700; color:#ef4444;">Pilihan A:</label>
+          <input type="text" class="inp-opt" data-opt="0" value="${esc(item.o[0])}" style="width:100%; box-sizing:border-box; padding:5px 8px; border-radius:8px; border:1px solid #cbd5e1; font-size:12px;">
+        </div>
+        <div>
+          <label style="font-size:11px; font-weight:700; color:#3b82f6;">Pilihan B:</label>
+          <input type="text" class="inp-opt" data-opt="1" value="${esc(item.o[1])}" style="width:100%; box-sizing:border-box; padding:5px 8px; border-radius:8px; border:1px solid #cbd5e1; font-size:12px;">
+        </div>
+        <div>
+          <label style="font-size:11px; font-weight:700; color:#16a34a;">Pilihan C:</label>
+          <input type="text" class="inp-opt" data-opt="2" value="${esc(item.o[2])}" style="width:100%; box-sizing:border-box; padding:5px 8px; border-radius:8px; border:1px solid #cbd5e1; font-size:12px;">
+        </div>
+        <div>
+          <label style="font-size:11px; font-weight:700; color:#e9a100;">Pilihan D:</label>
+          <input type="text" class="inp-opt" data-opt="3" value="${esc(item.o[3])}" style="width:100%; box-sizing:border-box; padding:5px 8px; border-radius:8px; border:1px solid #cbd5e1; font-size:12px;">
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center; margin-top:4px;">
+        <label style="font-size:12px; font-weight:700; color:#1e3a8a;">Jawaban Benar:</label>
+        <select class="sel-ans" style="padding:4px 8px; border-radius:8px; border:1px solid #cbd5e1; font-weight:700; font-size:13px; background:#e0f2fe; color:#0369a1;">
+          <option value="A" ${item.ans=='A'?'selected':''}>A</option>
+          <option value="B" ${item.ans=='B'?'selected':''}>B</option>
+          <option value="C" ${item.ans=='C'?'selected':''}>C</option>
+          <option value="D" ${item.ans=='D'?'selected':''}>D</option>
+        </select>
+      </div>
+    </div>
+  `).join('');
+}
+
+function saveVisualEditorToText() {
+  const cards = document.querySelectorAll('.soal-card');
+  const arr = [];
+  cards.forEach(card => {
+    const q = card.querySelector('.inp-q').value.trim();
+    const opts = [];
+    card.querySelectorAll('.inp-opt').forEach(inp => opts.push(inp.value.trim()));
+    const ans = card.querySelector('.sel-ans').value;
+    if (q && opts.length == 4) {
+      arr.push({ q, o: opts, ans, ex: 'Penjelasan materi terkait', tp: 'Sistem Pernapasan' });
+    }
+  });
+  if (arr.length > 0) {
+    $('ed').value = questionsToText(arr);
+    save();
+  }
+}
+
+/* FIREBASE DATABASE INTEGRATION */
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'lompat-jawaban-ipa';
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+let db = null, auth = null, currentUser = null;
+
+async function initFirebase() {
+  if (!firebaseConfig) return;
+  try {
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
+    const { getAuth, signInAnonymously, signInWithCustomToken } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
+    const { getFirestore } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    auth = getAuth(app);
+    const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+    if (token) {
+      const u = await signInWithCustomToken(auth, token);
+      currentUser = u.user;
+    } else {
+      const u = await signInAnonymously(auth);
+      currentUser = u.user;
+    }
+  } catch(e) {}
+}
+
+async function saveScoreToDb(scoreData) {
+  if (!db || !currentUser) await initFirebase();
+  if (!db || !currentUser) return false;
+  try {
+    const { collection, addDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'scores');
+    await addDoc(colRef, {
+      nama: scoreData.nama || 'Anonim',
+      kelas: scoreData.kelas || '7A',
+      score: scoreData.score || 0,
+      okCount: scoreData.okCount || 0,
+      totalQuestions: scoreData.totalQuestions || 0,
+      timestamp: Date.now(),
+      userId: currentUser.uid
+    });
+    return true;
+  } catch(e) { return false; }
+}
+
+async function fetchDbScores() {
+  if (!db || !currentUser) await initFirebase();
+  if (!db || !currentUser) return [];
+  try {
+    const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'scores');
+    const snap = await getDocs(colRef);
+    const list = [];
+    snap.forEach(doc => list.push(doc.data()));
+    list.sort((a,b) => (b.score || 0) - (a.score || 0));
+    return list;
+  } catch(e) { return []; }
+}
+
+let birds = [], scene, cam, ren, player, ped, legs = [], arms = [], lvl, S = [], Q = [], stage = 0, hearts = 3, score = 0, tries = 0, busy = false, running = false, hold = 0, res = [], wantT = 0, mode = 'cr', ln = null, drag = null;
+const P = { x: 0, y: 0, z: 0, vy: 0, g: true }, joy = { x: 0, y: 0 }, keys = {}, clock = new THREE.Clock();
+
+function mk(p, w, h, d, c, x, y, z, o, rz) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color: c, transparent: o < 1, opacity: o || 1 }));
+  m.position.set(x, y, z);
+  if (rz) m.rotation.z = rz;
+  p.add(m);
+  return m;
+}
+
+function glyph(t, col) {
+  const cv = document.createElement('canvas'); cv.width = cv.height = 64;
+  const x = cv.getContext('2d'); x.font = 'bold 56px Arial,sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.lineWidth = 5; x.strokeStyle = '#000'; x.fillStyle = col; x.strokeText(t, 32, 36); x.fillText(t, 32, 36);
+  return new THREE.Mesh(new THREE.PlaneGeometry(.3, .3), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv), transparent: true }));
+}
+
+function capm(g, col, back, pc, pw) {
+  mk(g, .8, .3, .8, col, 0, 2.8, 0);
+  mk(g, .64, .05, .42, col, 0, 2.66, back ? -.56 : .56);
+  mk(g, pw, .1, .04, pc, 0, 2.82, .41);
+}
+
+function avatar(c) {
+  const g = new THREE.Group(), sk = OPT.kulit.v[c.kulit][1], hc = OPT.warna.v[c.warna][1], SH = OPT.sepatu.v[c.sepatu], tall = c.sepatu == 4;
+  let sb = SH[1], so = SH[2], sa = SH[3];
+  if (c.sepatu == 5) { sb = c.sc; so = c.sa; sa = c.sa; }
+  legs = []; arms = [];
+  mk(g, .95, 1.05, .5, '#ffffff', 0, 1.35, 0);
+  mk(g, .16, .6, .04, '#1d4ed8', 0, 1.5, .26);
+  mk(g, .3, .14, .04, '#1d4ed8', 0, 1.83, .26);
+  mk(g, .24, .24, .04, '#2563eb', -.28, 1.55, .26);
+  [-1, 1].forEach(s => {
+    const a = new THREE.Group(); a.position.set(s * .64, 1.85, 0);
+    mk(a, .32, .5, .4, '#ffffff', 0, -.25, 0);
+    mk(a, .36, .1, .44, '#dfe6f7', 0, -.5, 0);
+    mk(a, .28, .5, .34, sk, 0, -.75, 0);
+    g.add(a); arms.push(a);
+
+    const l = new THREE.Group(); l.position.set(s * .24, .8, 0);
+    mk(l, .42, .6, .45, '#1d4ed8', 0, -.3, 0);
+    mk(l, .5, tall ? .5 : .3, .7, sb, 0, tall ? -.5 : -.65, .1);
+    mk(l, .52, .07, .72, so, 0, -.78, .1);
+    if (c.sepatu == 1 || c.sepatu == 2 || c.sepatu == 5) mk(l, .03, .12, .36, sa, s * .26, -.62, .1);
+    if (c.sepatu == 3) [-.54, -.62, -.7].forEach(y => mk(l, .03, .045, .34, sa, s * .26, y, .1));
+    if (tall) mk(l, .5, .14, .24, '#ffffff', 0, -.7, .38);
+    g.add(l); legs.push(l);
+  });
+  mk(g, .66, .66, .66, sk, 0, 2.2, 0);
+  mk(g, .1, .16, .04, '#111111', -.15, 2.25, .34);
+  mk(g, .1, .16, .04, '#111111', .15, 2.25, .34);
+  mk(g, .2, .04, .04, '#b91c1c', 0, 2.06, .34);
+  mk(g, .04, .04, .04, '#b91c1c', -.12, 2.09, .34);
+  mk(g, .04, .04, .04, '#b91c1c', .12, 2.09, .34);
+  
+  const r = c.rambut;
+  if (r == 0) { mk(g, .76, .3, .76, hc, 0, 2.62, 0); mk(g, .76, .5, .14, hc, 0, 2.35, -.31); mk(g, .34, .2, .1, hc, -.13, 2.47, .36); mk(g, .18, .3, .1, hc, -.31, 2.4, .36); }
+  if (r == 1) { mk(g, .7, .3, .7, hc, 0, 2.72, 0); mk(g, .78, .2, .78, hc, 0, 2.55, 0); mk(g, .7, .12, .08, hc, 0, 2.5, .36); mk(g, .76, .4, .1, hc, 0, 2.35, -.31); }
+  if (r == 2) { mk(g, .76, .3, .76, hc, 0, 2.62, 0); mk(g, .76, .2, .1, hc, 0, 2.46, .36); mk(g, .76, .5, .14, hc, 0, 2.35, -.31); }
+  if (r == 3) { mk(g, 1, .6, 1, hc, 0, 2.65, 0); mk(g, .84, .5, .84, hc, 0, 3.08, 0); mk(g, 1, .8, .3, hc, 0, 2.45, -.42); mk(g, .2, .5, .6, hc, -.5, 2.5, 0); mk(g, .2, .5, .6, hc, .5, 2.5, 0); }
+  if (r == 4) { mk(g, .7, .14, .7, hc, 0, 2.57, 0); mk(g, .7, .3, .06, hc, 0, 2.42, -.33); }
+  if (r == 5) { mk(g, .76, .26, .76, hc, 0, 2.6, 0); mk(g, .76, .1, .08, hc, 0, 2.52, .36); mk(g, .76, .35, .1, hc, 0, 2.38, -.3); }
+  
+  const t = c.topi;
+  if (t == 1) capm(g, '#15151a', 0, '#ffffff', .26);
+  if (t == 2) capm(g, '#f4f4f6', 0, '#15151a', .26);
+  if (t == 3) capm(g, '#15151a', 0, '#ffffff', .38);
+  if (t == 4) capm(g, '#f4f4f6', 1, '#7c5a1a', .3);
+  
+  const k = c.kaca, gy = 2.27, gz = .35, dk = '#111111';
+  if (k == 0) { mk(g, .76, .24, .07, '#4ade80', 0, gy, gz, .6); mk(g, .06, .12, .7, '#334155', -.35, gy, 0); mk(g, .06, .12, .7, '#334155', .35, gy, 0); mk(g, .76, .12, .06, '#334155', 0, gy, -.35); mk(g, .1, .22, .24, '#1f2937', -.41, gy, 0); mk(g, .1, .22, .24, '#1f2937', .41, gy, 0); }
+  if (k == 1) { mk(g, .76, .28, .07, '#bfe9ff', 0, gy, gz, .5); mk(g, .8, .04, .09, '#e8f4ff', 0, gy + .15, gz); mk(g, .8, .04, .09, '#e8f4ff', 0, gy - .15, gz); mk(g, .06, .12, .7, '#cbd5e1', -.35, gy, 0); mk(g, .06, .12, .7, '#cbd5e1', .35, gy, 0); mk(g, .76, .12, .06, '#cbd5e1', 0, gy, -.35); }
+  if (k == 2) [-1, 1].forEach(s => { mk(g, .32, .26, .05, dk, s * .17, gy, gz); const m = glyph('$', '#ffd400'); m.position.set(s * .17, gy, gz + .03); g.add(m); mk(g, .04, .05, .66, dk, s * .34, gy + .05, 0); });
+  if (k == 3) { [-1, 1].forEach(s => { mk(g, .3, .14, .05, '#000000', s * .17, gy - .02, gz); mk(g, .14, .07, .05, '#000000', s * .1, gy + .07, gz); mk(g, .04, .05, .66, '#000000', s * .34, gy + .02, 0); }); mk(g, .1, .05, .05, '#000000', 0, gy + .03, gz); mk(g, .05, .05, .06, '#ffffff', -.25, gy + .02, gz + .01); }
+  if (k == 4) { [-1, 1].forEach(s => { const x = s * .17; mk(g, .32, .04, .05, dk, x, gy + .12, gz); mk(g, .32, .04, .05, dk, x, gy - .12, gz); mk(g, .04, .26, .05, dk, x - .15, gy, gz); mk(g, .04, .26, .05, dk, x + .15, gy, gz); mk(g, .28, .2, .03, '#6ee7b7', x, gy, gz, .5); mk(g, .04, .05, .66, dk, s * .34, gy + .05, 0); }); mk(g, .08, .04, .05, dk, 0, gy + .05, gz); }
+  
+  if (c.nama) {
+    const cv = document.createElement('canvas'); cv.width = 256; cv.height = 64;
+    const x = cv.getContext('2d'); x.fillStyle = 'rgba(11,22,48,.8)'; x.fillRect(0, 8, 256, 48);
+    x.fillStyle = '#fff'; x.font = 'bold 30px Trebuchet MS,sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillText(c.nama, 128, 33);
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), transparent: true }));
+    sp.scale.set(2.2, .55, 1); sp.position.y = 3.6; g.add(sp);
+  }
+  return g;
+}
+
+function setAv() {
+  const ry = player ? player.rotation.y : 0;
+  if (player) scene.remove(player);
+  player = avatar(cfg); player.rotation.y = ry; scene.add(player);
+}
+
+function init() {
+  scene = new THREE.Scene(); scene.fog = new THREE.Fog(0xcfeaff, 55, 170);
+  cam = new THREE.PerspectiveCamera(60, 1, .1, 300);
+  ren = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  ren.setClearColor(0xffffff, 0); ren.setPixelRatio(Math.min(devicePixelRatio, 2));
+  $('app').appendChild(ren.domElement);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x7a8fb0, .95));
+  const d = new THREE.DirectionalLight(0xffffff, .55); d.position.set(10, 25, 12); scene.add(d);
+  
+  const sea = new THREE.Mesh(new THREE.PlaneGeometry(900, 900), new THREE.MeshBasicMaterial({ color: 0x3aa0d8, visible: false }));
+  sea.rotation.x = -Math.PI / 2; sea.position.set(0, -30, -150); scene.add(sea);
+  ped = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.5, .3, 28), new THREE.MeshLambertMaterial({ color: 0xe2e8f0 }));
+  ped.position.y = -.15; scene.add(ped);
+  setAv(); resize();
+}
+
+function resize() {
+  const a = $('app'); ren.setSize(a.clientWidth, a.clientHeight);
+  cam.aspect = a.clientWidth / a.clientHeight; cam.fov = cam.aspect < 1 ? 78 : 60;
+  cam.updateProjectionMatrix(); applyView();
+}
+addEventListener('resize', () => ren && resize());
+
+function letterPlane(ch) {
+  const c = document.createElement('canvas'); c.width = 256; c.height = 204;
+  const x = c.getContext('2d'); x.fillStyle = 'rgba(255,255,255,.2)';
+  for (let i = 0; i < 9; i++) {
+    x.beginPath(); x.ellipse(Math.random() * 256, Math.random() * 204, 10 + Math.random() * 26, 6 + Math.random() * 16, Math.random() * 3, 0, 7); x.fill();
+  }
+  x.strokeStyle = 'rgba(255,255,255,.55)'; x.lineWidth = 6; x.strokeRect(10, 10, 236, 184);
+  x.font = 'bold 130px Fredoka, Trebuchet MS, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.lineWidth = 14; x.lineJoin = 'round'; x.strokeStyle = 'rgba(0,0,0,.45)'; x.strokeText(ch, 128, 108);
+  x.fillStyle = '#fff'; x.fillText(ch, 128, 108);
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(7.2, 5.7), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true }));
+  m.rotation.x = -Math.PI / 2; return m;
+}
+
+function slab(w, d, x, z, y, col, list) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, 1, d), new THREE.MeshLambertMaterial({ color: col }));
+  m.position.set(x, y - .5, z); lvl.add(m);
+  const s = { m, x0: x - w / 2, x1: x + w / 2, z0: z - d / 2, z1: z + d / 2, on: true };
+  if (list) list.push(s); return s;
+}
+
+function bx(w, h, d, c, x, yy, z, em) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color: c, emissive: em || 0 }));
+  m.position.set(x, yy, z); lvl.add(m); return m;
+}
+
+function tree(x, y, z) {
+  bx(.8, 2.2, .8, 0x7a4a24, x, y + 1.1, z);
+  bx(3, 1.4, 3, 0x3f9a3a, x, y + 2.6, z);
+  bx(2, 1.2, 2, 0x4cb043, x, y + 3.7, z);
+}
+
+function island(x, y, z, w, d) {
+  bx(w, .5, d, 0x58b947, x, y - .25, z);
+  bx(w, 1.6, d, 0x9a6a3e, x, y - 1.3, z);
+  bx(w * .7, 1.6, d * .7, 0x8a8f9c, x, y - 2.9, z);
+  bx(w * .4, 1.4, d * .4, 0x7a7f8c, x, y - 4.4, z);
+  tree(x + w * .15, y, z - d * .1);
+}
+
+function scenery(y, i) {
+  bx(16.4, .3, .6, 0x2f7bff, 0, y - .15, 3.2);
+  [-8.3, 8.3].forEach(x => {
+    bx(.15, .15, 18.7, 0x9b6a35, x, y + 1, -6.25);
+    bx(.15, .15, 18.7, 0x9b6a35, x, y + .55, -6.25);
+    [3, -3, -9, -15.6].forEach(z => {
+      bx(.4, 1.4, .4, 0x8a5a2b, x, y + .7, z);
+      bx(.5, .5, .5, 0xffd666, x, y + 1.65, z, 0xffa800);
+    });
+  });
+  island(-24, y - 1.5, -8 - (i % 3) * 3, 11, 9);
+  island(25, y - 3, -4 - ((i + 1) % 3) * 3, 10, 8);
+}
+
+function bird() {
+  const g = new THREE.Group(), w = new THREE.MeshLambertMaterial({ color: 0xffffff });
+  g.add(new THREE.Mesh(new THREE.BoxGeometry(.5, .4, 1), w));
+  [-1, 1].forEach(s => {
+    const wg = new THREE.Mesh(new THREE.BoxGeometry(1, .08, .5), w);
+    wg.position.x = s * .6; g.add(wg); g.userData['w' + s] = wg;
+  });
+  lvl.add(g); return g;
+}
+
+function build() {
+  if (lvl) scene.remove(lvl);
+  lvl = new THREE.Group(); scene.add(lvl); S = []; birds = [];
+  for (let j = 0; j < 4; j++) birds.push(bird());
+  Q.forEach((q, i) => {
+    const y = i * H, st = { pads: [] };
+    st.start = slab(16, 6, 0, 0, y, 0xf2e2c4); scenery(y, i);
+    for (let k = 0; k < 4; k++) {
+      const p = slab(7.6, 6.1, k % 2 ? 4 : -4, k < 2 ? -6.05 : -12.55, y, COL[k], st.pads);
+      const lt = letterPlane(L[k]); lt.position.y = .52; p.m.add(lt);
+    }
+    S.push(st);
+  });
+  const cm = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: .9 });
+  for (let j = 0; j < 22; j++) {
+    const c = new THREE.Mesh(new THREE.BoxGeometry(6 + Math.random() * 6, 2, 3 + Math.random() * 3), cm);
+    const sd = Math.random() < .5 ? -1 : 1;
+    c.position.set(sd * (18 + Math.random() * 30), Math.random() * (Q.length * H + 10) - 5, -40 + Math.random() * 50);
+    lvl.add(c);
+  }
+}
+
+function surf(x, z) {
+  const st = S[stage]; if (!st) return null;
+  for (const s of [st.start, ...st.pads]) {
+    if (s.on && x >= s.x0 && x <= s.x1 && z >= s.z0 && z <= s.z1) return stage * H;
+  }
+  return null;
+}
+
+function padAt() {
+  const st = S[stage];
+  for (let k = 0; k < 4; k++) {
+    const p = st.pads[k];
+    if (p.on && P.x >= p.x0 && P.x <= p.x1 && P.z >= p.z0 && P.z <= p.z1) return k;
+  }
+  return -1;
+}
+
+function parse(t) {
+  return t.split('\n').map(l => l.split('|').map(s => s.trim())).filter(a => a.length >= 7 && /^[A-Da-d]$/.test(a[5]))
+    .map(a => ({ q: a[0], o: a.slice(1, 5), ans: 'ABCD'.indexOf(a[5].toUpperCase()), ex: a[6], tp: a[7] || 'Sistem Pernapasan' }));
+}
+
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startGame() {
+  Q = shuffle(parse($('ed').value));
+  if (!Q.length) { alert('Format soal belum benar. Silakan periksa kembali melalui menu Buat Soal.'); return; }
+  save(); stage = 0; hearts = 3; score = 0; tries = 0; busy = false; res = []; hold = 0; ln = null; mode = 'play';
+  ped.visible = false; applyView(); build(); respawn(); cam.position.set(0, 7.5, 11);
+  $('start').style.display = 'none'; $('end').style.display = 'none'; $('hud').style.display = 'block';
+  showQ(); running = true;
+}
+
+function respawn() { P.x = 0; P.z = 0; P.y = stage * H; P.vy = 0; P.g = true; player.rotation.y = Math.PI; }
+
+function showQ() {
+  const q = Q[stage]; $('q').textContent = q.q;
+  $('opts').innerHTML = q.o.map((t, i) => `<div class="o" style="background-color:${HEX[i]}"><b>${L[i]}</b> ${esc(t)}</div>`).join('');
+  hud();
+}
+
+function hud() {
+  $('prog').textContent = '📶 Lantai ' + (stage + 1) + '/' + Q.length;
+  $('hp').textContent = '❤️'.repeat(Math.max(hearts, 0)) + '🖤'.repeat(3 - Math.max(hearts, 0));
+  $('sc').textContent = '⭐ ' + score;
+}
+
+let tt;
+function toast(s) {
+  const t = $('toast'); t.textContent = s; t.style.display = 'block';
+  clearTimeout(tt); tt = setTimeout(() => t.style.display = 'none', 1800);
+}
+
+function expl(q) {
+  const e = $('ex'); e.innerHTML = '<b>Jawaban: ' + L[q.ans] + '.</b> ' + esc(q.ex); e.style.display = 'block';
+}
+
+function lock(k) {
+  busy = true; hold = 0; const q = Q[stage], p = S[stage].pads[k];
+  if (k === q.ans) {
+    const pts = tries ? 5 : 10; score += pts; res.push({ tp: q.tp, ok: !tries });
+    p.m.material.color.set(0x15803d); toast('✅ Benar! +' + pts); expl(q); hud();
+    playCorrectSound();
+    p.bounce = 0;
+    setTimeout(() => { ln = { t: 0, x: P.x, z: P.z, y: P.y, y1: (stage + 1) * H }; }, 400);
+    setTimeout(() => { $('ex').style.display = 'none'; }, 3800);
+  } else {
+    tries++; hearts--; p.on = false; p.fall = true; toast('❌ Salah → JATUH!'); hud();
+    playWrongSound();
+    if (hearts <= 0) {
+      res.push({ tp: q.tp, ok: false }); expl(q);
+      setTimeout(finish, 2600);
+    } else {
+      setTimeout(() => busy = false, 900);
+    }
+  }
+}
+
+async function finish() {
+  running = false; $('hud').style.display = 'none'; $('ex').style.display = 'none';
+  const ok = res.filter(r => r.ok).length;
+  const scoreData = { nama: cfg.nama || 'Pemain', kelas: cfg.kelas || '7A', score, okCount: ok, totalQuestions: res.length };
+  await saveScoreToDb(scoreData);
+  const dbScores = await fetchDbScores();
+
+  const by = {}; res.forEach(r => { by[r.tp] = by[r.tp] || { n: 0, k: 0 }; by[r.tp].n++; if (r.ok) by[r.tp].k++; });
+  const rows = Object.entries(by).map(([tp, v]) => {
+    const p = Math.round(v.k / v.n * 100);
+    const lb = p >= 80 ? 'Pengayaan' : p >= 60 ? 'Tuntas' : 'Perlu remedial';
+    return `<tr><td>${esc(tp)}</td><td>${v.k}/${v.n}</td><td>${p}%</td><td>${lb}</td></tr>`;
+  }).join('');
+
+  const dbRows = dbScores.slice(0, 5).map(s => `<tr><td>${esc(s.nama)} (${esc(s.kelas)})</td><td><b>${s.score}</b></td></tr>`).join('');
+
+  $('endc').innerHTML = `
+    <h2>${hearts > 0 ? '🏆 Selesai, ' + esc(cfg.nama || 'Pemain') + '!' : '💥 Nyawa habis, ' + esc(cfg.nama || 'Pemain')}</h2>
+    <p>Skor <b>${score}</b> · Benar percobaan 1: ${ok}/${res.length} soal</p>
+    <table><tr><th>Topik / TP</th><th>Benar</th><th>%</th><th>Status</th></tr>${rows}</table>
+    <h3 style="margin:14px 0 4px;font-size:15px;color:#38bdf8">📊 Rekap Peringkat Database</h3>
+    <table><tr><th>Siswa (Kelas)</th><th>Skor</th></tr>${dbRows || '<tr><td colspan="2">Belum ada data</td></tr>'}</table>
+    <button class="go" id="again">Main Lagi</button>
+    <button class="go sec" id="again2">Menu Utama</button>
+  `;
+  $('end').style.display = 'flex';
+  $('again').onclick = startGame;
+  $('again2').onclick = goHome;
+}
+
+function update(dt) {
+  if (ln) {
+    ln.t += dt / 1.1; const t = Math.min(ln.t, 1), e = 1 - Math.pow(1 - t, 3);
+    P.x = ln.x * (1 - e); P.z = ln.z * (1 - e); P.y = ln.y + (ln.y1 - ln.y) * e + Math.sin(Math.PI * t) * 4;
+    player.rotation.y += dt * 14; arms[0].rotation.z = -2.6; arms[1].rotation.z = 2.6;
+    player.position.set(P.x, P.y, P.z);
+    if (t >= 1) {
+      ln = null;
+      if (stage >= Q.length - 1) { finish(); return; }
+      stage++; respawn(); busy = false; tries = 0; showQ(); toast('⬆ Naik ke lantai ' + (stage + 1) + '!');
+    }
+    return;
+  }
+  let ix = (keys.arrowright || keys.d ? 1 : 0) - (keys.arrowleft || keys.a ? 1 : 0) + joy.x;
+  let iz = (keys.arrowdown || keys.s ? 1 : 0) - (keys.arrowup || keys.w ? 1 : 0) + joy.y;
+  const m = Math.hypot(ix, iz); if (m > 1) { ix /= m; iz /= m; }
+  P.x += ix * 7 * dt; P.z += iz * 7 * dt;
+  if (m > .1) {
+    player.rotation.y = Math.atan2(ix, iz);
+    stepTimer += dt;
+    if (stepTimer > 0.35) { playStepSound(); stepTimer = 0; }
+  }
+  if (wantT > 0) {
+    wantT -= dt;
+    if (P.g) { P.vy = 11; P.g = false; wantT = 0; playJumpSound(); }
+  }
+  P.vy -= 30 * dt; const ny = P.y + P.vy * dt, gy = surf(P.x, P.z);
+  if (gy !== null && P.y >= gy - .05 && ny <= gy) { P.y = gy; P.vy = 0; P.g = true; }
+  else { P.y = ny; P.g = false; }
+  if (P.y < stage * H - 12) respawn();
+  const k = (P.g && !busy) ? padAt() : -1;
+  if (k >= 0) { hold += dt; if (hold >= 1) lock(k); } else hold = 0;
+  $('holdw').style.display = hold > 0 ? 'block' : 'none';
+  $('hold').style.width = Math.min(hold, 1) * 100 + '%';
+  player.position.set(P.x, P.y, P.z);
+  const sw = m > .1 && P.g ? Math.sin(performance.now() / 90) * .7 : 0;
+  legs[0].rotation.x = sw; legs[1].rotation.x = -sw;
+  arms[0].rotation.x = -sw; arms[1].rotation.x = sw;
+  arms[0].rotation.z = arms[1].rotation.z = 0;
+}
+
+function anim(dt) {
+  S.forEach(s => s.pads.forEach(p => {
+    if (p.fall) {
+      p.m.position.y -= dt * 22;
+      p.m.rotation.z += dt * 3;
+      p.m.rotation.x += dt * 2;
+    }
+    if (p.bounce !== undefined) {
+      p.bounce += dt * 12;
+      p.m.position.y = (stage * H - .5) + Math.sin(p.bounce) * .8;
+      if (p.bounce > Math.PI) p.bounce = undefined;
+    }
+  }));
+  birds.forEach((b, j) => {
+    const t = performance.now() / 2500 + j * 1.6, f = Math.sin(performance.now() / 100) * .6;
+    b.position.set(Math.cos(t) * (22 + j * 3), P.y + 5 + j * 2, P.z - 14 + Math.sin(t) * 10);
+    b.rotation.y = -t; b.userData.w1.rotation.z = f; b.userData['w-1'].rotation.z = -f;
+  });
+  const tx = P.x * .6; cam.position.lerp(new THREE.Vector3(tx, P.y + 7.5, P.z + 11), Math.min(1, dt * 6));
+  cam.lookAt(tx, P.y + 1, P.z - 7);
+}
+
+function crCam(dt) {
+  if (drag === null) player.rotation.y += dt * .6;
+  player.position.set(0, 0, 0); arms[0].rotation.z = 0; arms[1].rotation.z = 2.4 + Math.sin(performance.now() / 160) * .4;
+  cam.position.set(0, 1.9, cam.aspect < 1 ? 7.6 : 6.2); cam.lookAt(0, cam.aspect < 1 ? .8 : 1.1, 0);
+}
+
+function loop() {
+  requestAnimationFrame(loop);
+  const dt = Math.min(clock.getDelta(), .05);
+  if (mode == 'cr') crCam(dt);
+  else { if (running) update(dt); anim(dt); }
+  ren.render(scene, cam);
+}
+
+let tr, ts, tc; const thumbs = {};
+const BASE = { kulit: 1, rambut: 0, warna: 3, topi: 0, kaca: 0, sepatu: 0, nama: '', kelas: '7A', sc: '#facc15', sa: '#2563eb' };
+const SEC = [
+  ['rambut', '#e3f1ff', '#2563eb', 'h'],
+  ['warna', '#fff3c4', '#d97706', 'h'],
+  ['topi', '#dcf5d6', '#16a34a', 'h'],
+  ['kaca', '#e9e3ff', '#7c3aed', 'h'],
+  ['sepatu', '#ffdfe5', '#e11d48', 'f'],
+  ['kulit', '#ffe8d2', '#c2410c', 'h']
+];
+
+function snap(c, v) {
+  const key = v + JSON.stringify(c); if (thumbs[key]) return thumbs[key];
+  if (!tr) {
+    tr = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+    tr.setPixelRatio(1); tr.setSize(144, 144);
+    ts = new THREE.Scene(); ts.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 1.1));
+    const d = new THREE.DirectionalLight(0xffffff, .6); d.position.set(3, 6, 8); ts.add(d);
+    tc = new THREE.PerspectiveCamera(30, 1, .1, 60);
+  }
+  const g = avatar(c); g.rotation.y = .35; ts.add(g);
+  if (v == 'h') { tc.position.set(0, 2.4, 4.6); tc.lookAt(0, 2.4, 0); }
+  else if (v == 'f') { tc.position.set(0, .5, 3.6); tc.lookAt(0, .45, 0); }
+  else { tc.position.set(0, 1.45, 9.5); tc.lookAt(0, 1.45, 0); }
+  tr.render(ts, tc); const u = tr.domElement.toDataURL(); ts.remove(g);
+  return thumbs[key] = u;
+}
+
+const lab = v => Array.isArray(v) ? v[0] : v;
+const lum = h => parseInt(h.slice(1, 3), 16) * .3 + parseInt(h.slice(3, 5), 16) * .59 + parseInt(h.slice(5, 7), 16) * .11;
+
+function ui() {
+  let h = '';
+  SEC.forEach((s, n) => {
+    h += `<div class="sec" style="background:${s[1]}"><div class="sh"><i style="background:${s[2]}">${n + 1}</i><b>Pilih ${esc(OPT[s[0]].n)}</b></div><div class="ths" data-k="${s[0]}">`;
+    h += OPT[s[0]].v.map((v, i) => {
+      const w = s[0] == 'warna', pc = w ? v[1] : s[2], tx = w && lum(pc) > 150 ? '#1a1200' : '#ffffff';
+      const o = s[0] == 'sepatu' && i == 5 ? { sepatu: 5, sc: cfg.sc, sa: cfg.sa } : { [s[0]]: i };
+      return `<button class="th${cfg[s[0]] == i ? ' on' : ''}" data-i="${i}"><img ${o.sc ? 'id="cw" ' : ''}src="${snap(Object.assign({}, BASE, o), s[3])}" alt=""><span style="background:${pc};color:${tx}">${esc(lab(v))}</span></button>`;
+    }).join('');
+    h += '</div>';
+    if (s[0] == 'sepatu') h += `<div class="cc" id="ccw" style="display:${cfg.sepatu == 5 ? 'flex' : 'none'}">Warna sepatu <input type="color" id="c1" value="${cfg.sc}"> Aksen <input type="color" id="c2" value="${cfg.sa}"></div>`;
+    h += '</div>';
+  });
+  $('secs').innerHTML = h;
+  setAv();
+}
+
+function syncOn() {
+  document.querySelectorAll('.ths').forEach(t => { [...t.children].forEach((x, i) => x.classList.toggle('on', cfg[t.dataset.k] == i)); });
+  $('ccw').style.display = cfg.sepatu == 5 ? 'flex' : 'none';
+}
+
+function applyView() {
+  const a = $('app'), W = a.clientWidth, Hh = a.clientHeight;
+  if (mode == 'cr') {
+    if (W < Hh) cam.setViewOffset(W, Hh, 0, Hh * .26, W, Hh);
+    else cam.setViewOffset(W, Hh, W * .3, 0, W, Hh);
+  } else cam.clearViewOffset();
+}
+
+function goHome() {
+  mode = 'home'; running = false;
+  $('home').style.display = 'flex';
+  $('cr').style.display = 'none';
+  $('ttl').style.display = 'none';
+  $('player-info-card').style.display = 'none';
+  $('hud').style.display = 'none';
+  $('start').style.display = 'none';
+  $('end').style.display = 'none';
+  if (ped) ped.visible = false;
+  if (lvl) lvl.visible = false;
+}
+
+function goCreator() {
+  mode = 'cr'; running = false;
+  $('home').style.display = 'none';
+  if (ped) ped.visible = true;
+  if (lvl) lvl.visible = false;
+  $('hud').style.display = 'none';
+  $('start').style.display = 'none';
+  $('end').style.display = 'none';
+  $('cr').style.display = 'block';
+  $('ttl').style.display = 'block';
+  $('player-info-card').style.display = 'block';
+  applyView();
+}
+
+/* TOMBOL HOME SCREEN & MODALS */
+$('btn-mulai').onclick = () => { initAudio(); goCreator(); };
+$('btn-buat-soal').onclick = () => {
+  renderVisualEditor();
+  $('modal-soal').style.display = 'flex';
+};
+$('btn-tambah-soal').onclick = () => {
+  saveVisualEditorToText();
+  const current = parseTextToQuestions($('ed').value);
+  current.push({ q: 'Pertanyaan baru...', o: ['Pilihan A', 'Pilihan B', 'Pilihan C', 'Pilihan D'], ans: 'A', ex: '-', tp: 'Sistem Pernapasan' });
+  $('ed').value = questionsToText(current);
+  renderVisualEditor();
+};
+$('soal-editor-list').onclick = e => {
+  if (e.target.classList.contains('btn-del-soal')) {
+    saveVisualEditorToText();
+    const idx = +e.target.dataset.index;
+    const current = parseTextToQuestions($('ed').value);
+    current.splice(idx, 1);
+    $('ed').value = questionsToText(current);
+    renderVisualEditor();
+  }
+};
+$('btn-close-soal').onclick = () => {
+  saveVisualEditorToText();
+  save();
+  $('modal-soal').style.display = 'none';
+};
+$('btn-unduh-soal').onclick = () => {
+  saveVisualEditorToText();
+  const arr = parseTextToQuestions($('ed').value);
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(arr, null, 2));
+  const dl = document.createElement('a');
+  dl.setAttribute("href", dataStr);
+  dl.setAttribute("download", "soal_sistem_pernapasan.json");
+  document.body.appendChild(dl);
+  dl.click();
+  dl.remove();
+};
+$('btn-pengaturan-suara').onclick = () => $('modal-suara').style.display = 'flex';
+$('btn-close-suara').onclick = () => $('modal-suara').style.display = 'none';
+
+$('btn-muat-soal').onclick = () => $('file-json').click();
+$('file-json').onchange = e => {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const arr = JSON.parse(ev.target.result);
+      const text = arr.map(a => `${a.q} | ${a.o[0]} | ${a.o[1]} | ${a.o[2]} | ${a.o[3]} | ${a.ans} | ${a.ex || '-'} | ${a.tp || 'Sistem Pernapasan'}`).join('\n');
+      $('ed').value = text;
+      save();
+      alert('Soal JSON berhasil dimuat!');
+    } catch(err) {
+      alert('Gagal memuat JSON. Pastikan formatnya benar.');
+    }
+  };
+  r.readAsText(f);
+};
+
+$('secs').onclick = e => { const b = e.target.closest('.th'); if (!b) return; const k = b.parentNode.dataset.k; cfg[k] = +b.dataset.i; syncOn(); setAv(); };
+$('secs').oninput = e => { const id = e.target.id; if (id == 'c1' || id == 'c2') { cfg[id == 'c1' ? 'sc' : 'sa'] = e.target.value; setAv(); $('cw').src = snap(Object.assign({}, BASE, { sepatu: 5, sc: cfg.sc, sa: cfg.sa }), 'f'); } };
+$('nm').oninput = e => { cfg.nama = e.target.value.trim(); setAv(); };
+$('kls').onchange = e => { cfg.kelas = e.target.value; save(); };
+$('next').onclick = () => { initAudio(); save(); $('cr').style.display = 'none'; $('ttl').style.display = 'none'; $('player-info-card').style.display = 'none'; $('start').style.display = 'flex'; };
+$('back').onclick = goCreator;
+
+$('app').addEventListener('pointerdown', e => { if (mode == 'cr') drag = e.clientX; initAudio(); });
+addEventListener('pointermove', e => { if (drag !== null) { player.rotation.y += (e.clientX - drag) * .012; drag = e.clientX; } });
+addEventListener('pointerup', () => drag = null);
+
+addEventListener('keydown', e => {
+  initAudio(); const k = e.key.toLowerCase();
+  if (k === ' ' && running) { wantT = .15; e.preventDefault(); }
+  if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') keys[k] = 1;
+});
+addEventListener('keyup', e => keys[e.key.toLowerCase()] = 0);
+$('jump').addEventListener('pointerdown', e => { initAudio(); e.preventDefault(); wantT = .15; });
+
+const jb = $('joy'), jk = $('knob'); let jid = null;
+function mv(e) {
+  const r = jb.getBoundingClientRect();
+  let dx = (e.clientX - r.left - r.width / 2) / (r.width / 2), dy = (e.clientY - r.top - r.height / 2) / (r.height / 2);
+  const m = Math.hypot(dx, dy); if (m > 1) { dx /= m; dy /= m; }
+  joy.x = dx; joy.y = dy; jk.style.transform = `translate(calc(-50% + ${dx * 32}px),calc(-50% + ${dy * 32}px))`;
+}
+jb.addEventListener('pointerdown', e => { initAudio(); jid = e.pointerId; jb.setPointerCapture(e.pointerId); mv(e); });
+jb.addEventListener('pointermove', e => { if (e.pointerId === jid) mv(e); });
+const up = e => { if (e.pointerId === jid) { jid = null; joy.x = joy.y = 0; jk.style.transform = 'translate(-50%,-50%)'; } };
+jb.addEventListener('pointerup', up); jb.addEventListener('pointercancel', up);
+
+try {
+  init();
+  $('nm').value = cfg.nama;
+  $('kls').value = cfg.kelas || '7A';
+  ui();
+  setupAudioUploads();
+  $('go').onclick = startGame;
+  goHome();
+  loop();
+  initFirebase();
+} catch (e) {
+  document.body.innerHTML = '<div style="padding:24px"><h2>Game tidak bisa dimuat</h2><p>Browser ini tidak mendukung WebGL atau pustaka 3D gagal dimuat.</p></div>';
+}
+</script>
+</body>
+</html>
